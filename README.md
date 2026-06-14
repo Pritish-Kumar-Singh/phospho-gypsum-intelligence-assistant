@@ -49,6 +49,154 @@ Engineers and decision-makers cannot manually parse thousands of document pages 
 
 ---
 
+## 🚀 Getting Started
+
+Follow these steps to run the Phospho-Gypsum Intelligence Assistant on your local machine.
+
+### 1️⃣ Clone the Repository
+
+```bash
+git clone https://github.com/YOUR_USERNAME/phospho-gypsum-intelligence-assistant.git
+
+cd phospho-gypsum-intelligence-assistant
+```
+
+---
+
+### 2️⃣ Create a Virtual Environment
+
+#### Windows
+
+```bash
+python -m venv venv
+
+venv\Scripts\activate
+```
+
+#### Linux / macOS
+
+```bash
+python -m venv venv
+
+source venv/bin/activate
+```
+
+---
+
+### 3️⃣ Install Dependencies
+
+Install all required Python packages:
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+### 4️⃣ Configure Gemini API Key
+
+Create a `.env` file in the project root directory.
+
+```text
+GOOGLE_API_KEY=YOUR_GEMINI_API_KEY
+```
+
+You can generate a Gemini API key from Google AI Studio.
+
+---
+
+### 5️⃣ Add Knowledge Base Documents
+
+Place all technical PDFs inside:
+
+```text
+data/raw_documents/
+```
+
+Examples:
+
+* IFFCO Reports
+* Research Papers
+* Government Guidelines
+* Sustainability Studies
+* Technical Documentation
+
+---
+
+### 6️⃣ Build the Vector Database
+
+Run the ingestion pipeline:
+
+```bash
+python src/ingestion/ingest.py
+```
+
+This process will:
+
+```text
+Load PDFs
+     ↓
+Extract Text
+     ↓
+Split into Chunks
+     ↓
+Generate Embeddings
+     ↓
+Create FAISS Vector Index
+```
+
+After successful execution, the following files will be generated:
+
+```text
+data/vector_store/
+├── index.faiss
+└── index.pkl
+```
+
+---
+
+### 7️⃣ Launch the Application
+
+Start the Streamlit application:
+
+```bash
+streamlit run src/ui/app.py
+```
+
+The application will be available at:
+
+```text
+http://localhost:8501
+```
+
+---
+
+## 📖 Example Queries
+
+Try asking:
+
+```text
+Can phospho-gypsum replace natural gypsum in cement manufacturing?
+```
+
+```text
+How can IFFCO utilize phospho-gypsum more effectively?
+```
+
+```text
+What are the environmental risks associated with phospho-gypsum stockpiles?
+```
+
+```text
+Can phospho-gypsum be used in road construction?
+```
+
+```text
+What industries should purchase phospho-gypsum from IFFCO?
+```
+
+---
+
 ## 🛠️ Tech Stack
 
 | Component | Technology | Description |
