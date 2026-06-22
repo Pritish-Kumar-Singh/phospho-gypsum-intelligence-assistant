@@ -1,11 +1,9 @@
-from src.retrieval.rag_chain import ask_question
 
 
-question = """
-Can phospho gypsum be used in road construction?
-"""
+from src.retrieval.rag_chain import rag_chain
 
+response = rag_chain.invoke(
+    "What are the applications of phospho gypsum?"
+)
 
-answer = ask_question(question)
-
-print(answer)
+print(response.content)

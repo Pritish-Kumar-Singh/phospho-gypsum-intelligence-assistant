@@ -1,14 +1,32 @@
+from langchain_core.runnables import (
+    RunnableLambda,
+    RunnablePassthrough
+)
+
+from langchain_core.prompts import ChatPromptTemplate
+
 from langchain_community.vectorstores import FAISS
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_google_genai import ChatGoogleGenerativeAI
 
-from src.config import GOOGLE_API_KEY, VECTOR_DB_PATH
-from src.prompts import SYSTEM_PROMPT
+from src.config import (
+    GOOGLE_API_KEY,
+    VECTOR_DB_PATH
+)
 
+
+# ==========================================================
+# Embeddings
+# ==========================================================
 
 embeddings = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2"
 )
+
+
+# ==========================================================
+# Vector Store
+# ==========================================================
 
 vectorstore = FAISS.load_local(
     VECTOR_DB_PATH,
@@ -16,9 +34,20 @@ vectorstore = FAISS.load_local(
     allow_dangerous_deserialization=True
 )
 
+
+# ==========================================================
+# Retriever
+# ==========================================================
+
 retriever = vectorstore.as_retriever(
-    search_kwargs={"k": 8}
+    search_type="similarity",
+    search_kwargs={"k": 5}
 )
+
+
+# ==========================================================
+# LLM
+# ==========================================================
 
 llm = ChatGoogleGenerativeAI(
     model="gemini-2.5-flash",
@@ -27,44 +56,88 @@ llm = ChatGoogleGenerativeAI(
 )
 
 
-def ask_question(question):
+# ==========================================================
+# Helper Function
+# ==========================================================
 
-    docs = retriever.invoke(question)
-
-    context = "\n\n".join(
-        doc.page_content for doc in docs
+def format_docs(docs):
+    return "\n\n".join(
+        doc.page_content
+        for doc in docs
     )
 
-    sources = sorted(
-        set(
-            doc.metadata.get("source_file", "Unknown")
-            for doc in docs
-        )
-    )
 
-    prompt = f"""
-{SYSTEM_PROMPT}
+# ==========================================================
+# Prompt
+# ==========================================================
 
-CONTEXT:
+prompt = ChatPromptTemplate.from_template(
+"""
+You are the Phospho-Gypsum Intelligence Assistant.
+
+You are NOT a general chatbot.
+
+You are an expert consultant specializing in:
+
+- Phospho Gypsum
+- IFFCO
+- Sustainable Utilization
+- Cement Applications
+- Agriculture Applications
+- Road Construction Applications
+- Waste Management
+- Environmental Impact
+- Industrial Recommendations
+
+Use ONLY the provided context.
+
+Question:
+{question}
+
+Context:
 {context}
 
-QUESTION:
-{question}
+If information is not available in the context, clearly state:
+
+"Information not found in the available knowledge base."
+
+Always provide the answer in the following format:
+
+## Summary
+
+Provide a concise answer.
+
+## Detailed Explanation
+
+Provide detailed evidence-based explanation.
+
+## Recommendation
+
+Provide practical recommendations.
+
+## Sources Used
+
+List the source documents used.
 """
+)
 
-    response = llm.invoke(prompt)
 
-    source_text = "\n".join(
-        f"- {source}"
-        for source in sources
-    )
+# ==========================================================
+# RAG Inputs
+# ==========================================================
 
-    return f"""
-{response.content}
+rag_inputs = {
+    "question": RunnablePassthrough(),
+    "context": retriever | RunnableLambda(format_docs)
+}
 
----
 
-### Retrieved Source Documents
+# ==========================================================
+# Main Chain
+# ==========================================================
 
-{source_text}
-"""
+rag_chain = (
+    rag_inputs
+    | prompt
+    | llm
+)

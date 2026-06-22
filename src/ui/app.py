@@ -8,7 +8,7 @@ sys.path.append(
     )
 )
 
-from src.retrieval.rag_chain import ask_question
+from src.retrieval.rag_chain import rag_chain
 
 st.set_page_config(
     page_title="Phospho-Gypsum Intelligence Assistant",
@@ -37,7 +37,8 @@ if st.button("Generate Answer"):
 
         with st.spinner("Analyzing documents and generating recommendations..."):
 
-            answer = ask_question(question)
+            response = rag_chain.invoke(question)
+            answer = response.content
 
         st.success("Analysis Complete")
 
