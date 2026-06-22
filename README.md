@@ -208,7 +208,7 @@ What industries should purchase phospho-gypsum from IFFCO?
 | **Vector Database** | `FAISS` | High-performance local vector similarity search |
 | **Embedding Model** | `Sentence Transformers` | `all-MiniLM-L6-v2` for generating semantic text vectors |
 | **Document Loader**| `PyPDFLoader` | Extracts text data cleanly from structured PDFs |
-| **Text Chunking** | `RecursiveCharacterTextSplitter` | Smart contextual splitting of technical text blocks |
+| **Text Chunking** | `SemanticChunker` | Smart contextual splitting of technical text blocks |
 | **Environment Mgmt**| `python-dotenv` | Secure handling of API credentials via `.env` |
 
 ---
